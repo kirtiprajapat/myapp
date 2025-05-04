@@ -8,7 +8,7 @@ pipeline {
     stages{
         stage('clone repo '){
             steps {
-               git  https://github.com/kirtiprajapat/myapp.git
+               git  'https://github.com/kirtiprajapat/myapp.git'
             }
         }
         stage("insatll dependencies"){
