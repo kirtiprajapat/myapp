@@ -13,12 +13,12 @@ pipeline {
         }
         stage("insatll dependencies"){
             steps {
-                bat 'npm install'
+                sh 'npm install'
             }
         }
         stage('run app'){
             steps{
-                bat 'npm start'
+                sh 'npm start'
             }
         }
     }
