@@ -15,12 +15,13 @@ pipeline {
             steps{
                 echo 'installing dependenciesv ..'
                 sh 'npm install'
+                sh 'npm install -g nodemon'
             }
         }
         stage('Run start') {
             steps {
                 echo 'running tests...'
-                sh 'npm start'
+                sh 'nodemon app.js'
             }
         }
         stage('build'){

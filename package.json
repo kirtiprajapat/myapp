@@ -5,7 +5,7 @@
   "main": "app.js",
   "git_repository":"",
   "scripts": {
-    "start":"node app.js"
+    "start":"nodemon app.js"
   },
   "author": "kirti prajapti",
   "license": "ISC"
