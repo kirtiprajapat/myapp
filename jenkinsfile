@@ -22,7 +22,7 @@ pipeline {
         stage('start server with nodemon'){
             steps{
                 echo 'starting server with nodemon...'
-                sh 'nohup npx nodemon app.js'
+                sh 'npx nodemon app.js'
                 
             }
         }
