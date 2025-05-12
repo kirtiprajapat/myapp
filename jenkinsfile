@@ -18,15 +18,16 @@ pipeline {
                 sh 'npm install --save-dev nodemon'
             }
         }
-        stage('Run start') {
+        stage('stop privious server') {
             steps {
-                echo 'running tests...'
-                sh ' npx nodemon app.js'
+                echo 'stoping previous server'
+                sh ' pkill -f "nodemon app.js" ||true'
             }
         }
-        stage('build'){
+        stage('start server with nodemon'){
             steps{
-                echo 'building...'
+                echo 'starting server with nodemon...'
+                sh 'nohup npx nodemon app.js > output.log 2&1 &'
                 
             }
         }
