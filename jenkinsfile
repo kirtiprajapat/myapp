@@ -1,98 +1,31 @@
-// pipeline {
-//     agent any 
-//     environment{
-//         NODE_ENV = 'production'
-//     }
-
-//     stages {
-//         stage('Clone repository') {
-//             steps {
-//                 echo 'cloning repository...'
-//                 git 'https://github.com/kirtiprajapat/myapp.git'
-//             }
-//         }
-//         stage('Install dependencies'){
-//             steps{
-//                 echo 'installing dependenciesv ..'
-//                 sh 'npm install'
-//                 sh 'npm install --save-dev nodemon'
-//             }
-//         }
-        
-//         stage('start server with nodemon'){
-//             steps{
-//                 echo 'starting server with nodemon...'
-//                 sh 'npx nodemon app.js'
-                
-//             }
-//         }
-//     }
-// }
-
 pipeline {
-    agent any
- 
-    environment {
+    agent any 
+    environment{
         NODE_ENV = 'production'
-        APP_NAME = 'my-node-app'
-        APP_DIR = 'myapp'
     }
- 
+
     stages {
         stage('Clone repository') {
             steps {
-git 'https://github.com/kirtiprajapat/myapp.git'
+                echo 'cloning repository...'
+                git 'https://github.com/kirtiprajapat/myapp.git'
             }
         }
- 
-        stage('Install dependencies') {
-            steps {
-                dir("${APP_DIR}") {
-                    sh 'npm install'
-                    sh 'npm install pm2'
-                    sh 'ls -la ./node_modules/.bin'  // verify pm2 exists
-                }
+        stage('Install dependencies'){
+            steps{
+                echo 'installing dependenciesv ..'
+                sh 'npm install'
+                sh 'npm install --save-dev nodemon'
             }
         }
- 
-        stage('Start or Reload App with PM2') {
-            steps {
-                dir("${APP_DIR}") {
-                    sh '''
-                        PM2="./node_modules/.bin/pm2"
- 
-                        if [ -f "$PM2" ]; then
-                            if $PM2 list | grep -q my-node-app; then
-                                echo "Reloading app..."
-                                $PM2 reload my-node-app --update-env
-                            else
-                                echo "Starting app..."
-                                $PM2 start app.js --name "my-node-app" --watch
-                            fi
-                        else
-                            echo "ERROR: PM2 not found in node_modules/.bin"
-                            exit 1
-                        fi
-                    '''
-                }
+        
+        stage('start server with nodemon'){
+            steps{
+                echo 'starting server with nodemon...'
+                sh 'npx nodemon app.js'
+                
             }
         }
- 
-        stage('PM2 Status') {
-            steps {
-                dir("${APP_DIR}") {
-                    sh './node_modules/.bin/pm2 list'
-                }
-            }
-        }
-    }
- 
-    post {
-        success {
-            echo 'App successfully deployed.'
-        }
-        failure {
-            echo 'Deployment failed. Please'
-            }
     }
 }
+
