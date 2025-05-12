@@ -37,11 +37,11 @@
 
 pipeline {
     agent any
- 
+    
     environment {
         NODE_ENV = 'production'
     }
- 
+    
     stages {
         stage('Clone repository') {
             steps {
@@ -49,29 +49,31 @@ pipeline {
 git 'https://github.com/kirtiprajapat/myapp.git'
             }
         }
- 
+        
         stage('Install dependencies') {
             steps {
                 echo 'Installing dependencies...'
                 sh 'npm install'
+                sh 'npm install -g nodemon'
+            }
+        }
+        
+        stage('Deploy application') {
+            steps {
+                echo 'Deploying application...'
+                // Set upstream branch for git pull if not already set
+                sh 'git branch --set-upstream-to=origin/master master'
+                sh 'git pull origin master'  // Pull latest changes from master branch
+                
+                // Start application with pm2
+                sh 'pm2 start app.js'
             }
         }
  
-        stage('Deploy Application') {
+        stage('Run start') {
             steps {
-                echo 'Deploying application...'
- 
-                // Pull the latest changes
-                sh 'git pull'
- 
-                // Ensure app is not running, if it is, kill it
-                sh 'pkill -f "node app.js" || true'
- 
-                // Restart app with PM2 (if using PM2)
-                sh 'pm2 restart app.js || pm2 start app.js'
- 
-                // Alternatively, if you're not using PM2, just run with 'nohup':
-                // sh 'nohup node app.js > output.log 2>&1 &'
+                echo 'Running application with nodemon...'
+                sh 'npx nodemon app.js'
             }
         }
     }
