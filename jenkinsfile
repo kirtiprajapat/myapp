@@ -36,7 +36,6 @@ pipeline {
         NODE_ENV = 'production'
         APP_NAME = 'my-node-app'
         APP_DIR = 'myapp'
-        PM2_PATH = './node_modules/.bin/pm2'
     }
  
     stages {
@@ -50,7 +49,8 @@ git 'https://github.com/kirtiprajapat/myapp.git'
             steps {
                 dir("${APP_DIR}") {
                     sh 'npm install'
-                    sh 'npm install pm2' // local install
+                    sh 'npm install pm2'
+                    sh 'ls -la ./node_modules/.bin'  // verify pm2 exists
                 }
             }
         }
@@ -59,12 +59,19 @@ git 'https://github.com/kirtiprajapat/myapp.git'
             steps {
                 dir("${APP_DIR}") {
                     sh '''
-                        if ${PM2_PATH} list | grep -q $APP_NAME; then
-                            echo "Reloading app..."
-                            ${PM2_PATH} reload $APP_NAME --update-env
+                        PM2="./node_modules/.bin/pm2"
+ 
+                        if [ -f "$PM2" ]; then
+                            if $PM2 list | grep -q my-node-app; then
+                                echo "Reloading app..."
+                                $PM2 reload my-node-app --update-env
+                            else
+                                echo "Starting app..."
+                                $PM2 start app.js --name "my-node-app" --watch
+                            fi
                         else
-                            echo "Starting app..."
-                            ${PM2_PATH} start app.js --name "$APP_NAME" --watch
+                            echo "ERROR: PM2 not found in node_modules/.bin"
+                            exit 1
                         fi
                     '''
                 }
@@ -74,7 +81,7 @@ git 'https://github.com/kirtiprajapat/myapp.git'
         stage('PM2 Status') {
             steps {
                 dir("${APP_DIR}") {
-                    sh '${PM2_PATH} list'
+                    sh './node_modules/.bin/pm2 list'
                 }
             }
         }
@@ -82,10 +89,9 @@ git 'https://github.com/kirtiprajapat/myapp.git'
  
     post {
         success {
-            echo 'App is deployed and running with local PM2.'
+            echo 'App successfully deployed.'
         }
         failure {
-            echo 'Deployment failed. Check PM2 and Jenkins logs.'
-        }
-    }
-}
+            echo 'Deployment failed. Please'
+            }
+    }   
