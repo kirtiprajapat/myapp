@@ -94,4 +94,5 @@ git 'https://github.com/kirtiprajapat/myapp.git'
         failure {
             echo 'Deployment failed. Please'
             }
-    }   
+    }
+}
