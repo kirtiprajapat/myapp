@@ -1,91 +1,35 @@
-// pipeline {
-//     agent any 
-//     environment{
-//         NODE_ENV = 'production'
-//     }
-
-//     stages {
-//         stage('Clone repository') {
-//             steps {
-//                 echo 'cloning repository...'
-//                 git 'https://github.com/kirtiprajapat/myapp.git'
-//             }
-//         }
-//         stage('Install dependencies'){
-//             steps{
-//                 echo 'installing dependenciesv ..'
-//                 sh 'npm install'
-//                 sh 'npm install -g nodemon'
-//             }
-//         }
-//         stage('Run start') {
-//             steps {
-//                 echo 'running tests...'
-//                 sh 'nodemon app.js'
-//             }
-//         }
-//         stage('build'){
-//             steps{
-//                 echo 'building...'
-                
-//             }
-//         }
-//     }
-// }
-
 pipeline {
-    agent any
- 
-    environment {
+    agent any 
+    environment{
         NODE_ENV = 'production'
     }
- 
+
     stages {
-        stage('Checkout') {
+        stage('Clone repository') {
             steps {
-                echo 'Checking out source code…'
-git url: 'https://github.com/kirtiprajapat/myapp.git', branch: 'master'
+                echo 'cloning repository...'
+                git 'https://github.com/kirtiprajapat/myapp.git'
             }
         }
- 
-        stage('Install Dependencies') {
-            steps {
-                echo 'Installing npm dependencies…'
+        stage('Install dependencies'){
+            steps{
+                echo 'installing dependenciesv ..'
                 sh 'npm install'
+                sh 'npm install -g nodemon'
             }
         }
- 
-        stage('Run Tests') {
+        stage('Run start') {
             steps {
-                echo 'Running tests (if any)…'
-                sh 'npm test || echo "No tests defined"'
+                echo 'running tests...'
+                sh 'nodemon app.js'
             }
         }
- 
-        stage('Build / Lint') {
-            steps {
-                echo 'Build or lint step – add commands here if needed'
-                // e.g. sh 'npm run lint'
+        stage('build'){
+            steps{
+                echo 'building...'
+                
             }
-        }
- 
-        stage('Start App') {
-            steps {
-                echo 'Starting the app with nodemon…'
-                sh 'npx nodemon app.js'
-            }
-        }
-    }
- 
-    post {
-        success {
-            echo '✅ Pipeline succeeded!'
-        }
-        failure {
-            echo '❌ Pipeline failed!'
-        }
-        always {
-            echo '— Pipeline run finished —'
         }
     }
 }
+
