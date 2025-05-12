@@ -1,80 +1,32 @@
-// pipeline {
-//     agent any 
-//     environment{
-//         NODE_ENV = 'production'
-//     }
-
-//     stages {
-//         stage('Clone repository') {
-//             steps {
-//                 echo 'cloning repository...'
-//                 git 'https://github.com/kirtiprajapat/myapp.git'
-//             }
-//         }
-//         stage('Install dependencies'){
-//             steps{
-//                 echo 'installing dependenciesv ..'
-//                 sh 'npm install'
-//                 sh 'npm install --save-dev nodemon'
-//             }
-//         }
-//         stage('stop privious server') {
-//             steps {
-//                 echo 'stoping previous server'
-//                 sh ' pkill -f "nodemon app.js" ||true'
-//             }
-//         }
-//         stage('start server with nodemon'){
-//             steps{
-//                 echo 'starting server with nodemon...'
-//                 sh 'nohup npx nodemon app.js > output.log 2&1 &'
-                
-//             }
-//         }
-//     }
-// }
-
-
 pipeline {
-    agent any
-    
-    environment {
+    agent any 
+    environment{
         NODE_ENV = 'production'
     }
-    
+
     stages {
         stage('Clone repository') {
             steps {
-                echo 'Cloning repository...'
-git 'https://github.com/kirtiprajapat/myapp.git'
+                echo 'cloning repository...'
+                git 'https://github.com/kirtiprajapat/myapp.git'
             }
         }
-        
-        stage('Install dependencies') {
-            steps {
-                echo 'Installing dependencies...'
+        stage('Install dependencies'){
+            steps{
+                echo 'installing dependenciesv ..'
                 sh 'npm install'
-                sh 'npm install -g nodemon'
+                sh 'npm install --save-dev nodemon'
             }
         }
         
-        stage('Deploy application') {
-            steps {
-                echo 'Deploying application...'
-                // Set upstream branch for git pull if not already set
-                sh 'git branch --set-upstream-to=origin/master master'
-                sh 'git pull origin master'  // Pull latest changes from master branch
+        stage('start server with nodemon'){
+            steps{
+                echo 'starting server with nodemon...'
+                sh 'nohup npx nodemon app.js'
                 
-                // Start application with pm2
-                sh 'pm2 start app.js'
-            }
-        }
- 
-        stage('Run start') {
-            steps {
-                echo 'Running application with nodemon...'
-                sh 'npx nodemon app.js'
             }
         }
     }
 }
+
+
