@@ -34,6 +34,8 @@ pipeline {
  
     environment {
         NODE_ENV = 'production'
+        APP_NAME = 'my-node-app'
+        APP_DIR = 'myapp' // this should match your repo root folder if it gets cloned into one
     }
  
     stages {
@@ -46,61 +48,50 @@ git 'https://github.com/kirtiprajapat/myapp.git'
  
         stage('Install dependencies') {
             steps {
-                echo 'Installing dependencies...'
-                sh 'npm install'
-                sh 'npm install --save-dev nodemon pm2'  // Install PM2 and nodemon globally if not installed
+                dir("${APP_DIR}") {
+                    echo 'Installing dependencies...'
+                    sh 'npm install'
+                    sh 'npm install -g pm2'
+                }
             }
         }
  
-        stage('Start server with PM2') {
+        stage('Start or Reload App with PM2') {
             steps {
-                echo 'Starting server with PM2...'
- 
-                // Start the app using PM2 to ensure it keeps running even after code changes
-                sh 'pm2 start app.js --name "my-node-app" --watch'
+                dir("${APP_DIR}") {
+                    echo 'Starting or reloading the Node.js app with PM2...'
+                    sh '''
+                        if pm2 list | grep -q $APP_NAME; then
+                            echo "Reloading existing app..."
+                            pm2 reload $APP_NAME --update-env
+                        else
+                            echo "Starting app for the first time..."
+                            pm2 start app.js --name "$APP_NAME" --watch
+                        fi
+                    '''
+                }
             }
         }
  
-        stage('Reload server with PM2') {
+        stage('PM2 Process List') {
             steps {
-                echo 'Reloading server with PM2...'
-                // This step ensures that changes in the code are reflected in the running server without full restart
-                sh 'pm2 reload my-node-app --update-env'
-            }
-        }
- 
-        stage('Save PM2 Process') {
-            steps {
-                echo 'Saving PM2 process list...'
-                // Save the PM2 process list so it can be resurrected after server restarts
-                sh 'pm2 save'
-            }
-        }
- 
-        stage('Check PM2 Status') {
-            steps {
-                echo 'Checking PM2 status...'
-                // Check the PM2 process status to ensure it is running as expected
+                echo 'Listing PM2 processes...'
                 sh 'pm2 list'
             }
         }
     }
  
     post {
-        always {
-            echo 'Cleaning up...'
-            // Optionally, stop the server at the end of the pipeline to ensure a clean state for future builds
-            sh 'pm2 stop my-node-app || true'
-        }
- 
         success {
-            echo 'Pipeline executed successfully!'
+            echo 'Deployment successful. App is running with PM2.'
         }
  
         failure {
-            echo 'Pipeline execution failed!'
+            echo 'Deployment failed. Check PM2 logs and Jenkins output.'
+        }
+ 
+        cleanup {
+            echo 'Note: App will continue running. No cleanup performed.'
         }
     }
 }
-
-
