@@ -35,7 +35,11 @@ pipeline {
     environment {
         NODE_ENV = 'production'
     }
- 
+    
+    triggers {
+        pollSCM('* * * * *') // Poll SCM every 5 minutes
+    }
+
     stages {
         stage('Clone repository') {
             steps {
